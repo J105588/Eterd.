@@ -1,0 +1,382 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Plus, Edit2, Trash2, X, Loader2, Calendar, Upload } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface EventItem {
+  id: string;
+  title: string;
+  event_date: string;
+  description: string | null;
+  image_url: string | null;
+  venue: string | null;
+  ticket_link: string | null;
+  google_form_link: string | null;
+  youtube_url: string | null;
+  is_public: boolean;
+}
+
+export default function EventsAdminContent() {
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
+
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [uploadingFile, setUploadingFile] = useState(false);
+
+  const [formData, setFormData] = useState({
+    title: '',
+    event_date: '',
+    description: '',
+    image_url: '',
+    venue: '',
+    ticket_link: '',
+    google_form_link: '',
+    youtube_url: '',
+    is_public: true,
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('event_date', { ascending: true });
+
+    if (data) setEvents(data);
+    setLoading(false);
+  };
+
+  const handleOpenModal = (event: EventItem | null = null) => {
+    if (event) {
+      setEditingEvent(event);
+      setFormData({
+        title: event.title,
+        event_date: event.event_date,
+        description: event.description || '',
+        image_url: event.image_url || '',
+        venue: event.venue || '',
+        ticket_link: event.ticket_link || '',
+        google_form_link: event.google_form_link || '',
+        youtube_url: event.youtube_url || '',
+        is_public: event.is_public ?? true,
+      });
+      setUploadMode('url');
+    } else {
+      setEditingEvent(null);
+      setFormData({
+        title: '',
+        event_date: new Date().toISOString().split('T')[0],
+        description: '',
+        image_url: '',
+        venue: '',
+        ticket_link: '',
+        google_form_link: '',
+        youtube_url: '',
+        is_public: true,
+      });
+      setUploadMode('url');
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `events/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('events')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('events')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+    } catch (error: any) {
+      alert('Upload failed: ' + error.message);
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    if (editingEvent) {
+      const { error } = await supabase
+        .from('events')
+        .update(formData)
+        .eq('id', editingEvent.id);
+      if (error) alert(error.message);
+    } else {
+      const { error } = await supabase
+        .from('events')
+        .insert([formData]);
+      if (error) alert(error.message);
+    }
+
+    setIsSaving(false);
+    setIsModalOpen(false);
+    fetchEvents();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this event?')) {
+      const { error } = await supabase.from('events').delete().eq('id', id);
+      if (error) alert(error.message);
+      else fetchEvents();
+    }
+  };
+
+  return (
+    <div className="space-y-12">
+      <header className="flex justify-between items-end">
+        <div className="space-y-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-secondary">Schedule Management</p>
+          <h1 className="text-4xl font-light">Performance Events</h1>
+        </div>
+        <button
+          onClick={() => handleOpenModal()}
+          className="bg-black text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center gap-4"
+        >
+          <Plus size={16} /> Create New Event
+        </button>
+      </header>
+
+      {loading ? (
+        <div className="flex justify-center py-24">
+          <Loader2 className="animate-spin text-gray-200" size={32} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {events.map((event) => (
+            <div key={event.id} className="bg-white border border-gray-100 p-8 flex items-center justify-between group hover:border-black transition-all">
+              <div className="flex items-center gap-8">
+                <div className="flex flex-col items-center justify-center p-3 bg-gray-50 luxury-text w-20">
+                  <span className="text-xs text-secondary">{event.event_date.split('-')[1]}/{event.event_date.split('-')[2]}</span>
+                  <span className="text-xl font-bold">{event.event_date.split('-')[0]}</span>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-xl font-light">{event.title}</h3>
+                    {!event.is_public && (
+                      <span className="text-[8px] uppercase tracking-widest bg-gray-100 px-2 py-0.5 text-gray-400 font-bold">Draft</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-secondary uppercase tracking-widest">{event.venue || "No venue set"}</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleOpenModal(event)}
+                  className="p-3 text-secondary hover:text-black hover:bg-gray-50 transition-all"
+                >
+                  <Edit2 size={18} />
+                </button>
+                <button
+                  onClick={() => handleDelete(event.id)}
+                  className="p-3 text-secondary hover:text-red-500 hover:bg-red-50 transition-all"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl my-auto">
+            <div className="p-8 md:p-12">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-8 right-8 text-secondary hover:text-black z-10"
+              >
+                <X size={24} />
+              </button>
+
+              <h2 className="luxury-text text-2xl font-bold mb-10">
+                {editingEvent ? 'Edit Event' : 'Create New Event'}
+              </h2>
+
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="flex items-center gap-4 pb-4 border-b border-gray-50">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, is_public: !formData.is_public })}
+                    className={cn(
+                      "w-12 h-6 rounded-full transition-all relative flex items-center px-1",
+                      formData.is_public ? "bg-black" : "bg-gray-200"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-4 h-4 bg-white rounded-full transition-transform",
+                      formData.is_public ? "translate-x-6" : "translate-x-0"
+                    )} />
+                  </button>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Public Visibility</label>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Event Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={formData.event_date}
+                      onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Venue</label>
+                    <input
+                      type="text"
+                      value={formData.venue}
+                      onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Description / Info</label>
+                  <textarea
+                    rows={3}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all resize-none"
+                    placeholder="Additional event details..."
+                  />
+                </div>
+
+                <div className="space-y-4 pt-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Event Image / Flyer</label>
+                    <div className="flex gap-2 p-1 bg-gray-100 rounded-sm">
+                      <button
+                        type="button"
+                        onClick={() => setUploadMode('file')}
+                        className={cn("px-4 py-1 text-[9px] uppercase tracking-widest transition-all", uploadMode === 'file' ? "bg-white text-black shadow-sm" : "text-gray-400")}
+                      >
+                        File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUploadMode('url')}
+                        className={cn("px-4 py-1 text-[9px] uppercase tracking-widest transition-all", uploadMode === 'url' ? "bg-white text-black shadow-sm" : "text-gray-400")}
+                      >
+                        URL
+                      </button>
+                    </div>
+                  </div>
+
+                  {uploadMode === 'file' ? (
+                    <div className="relative border-2 border-dashed border-gray-100 p-8 text-center hover:border-black transition-all group">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                      <div className="space-y-2">
+                        {uploadingFile ? (
+                          <Loader2 className="animate-spin mx-auto text-black" size={24} />
+                        ) : (
+                          <Upload className="mx-auto text-gray-300 group-hover:text-black transition-colors" size={24} />
+                        )}
+                        <p className="text-[10px] uppercase tracking-widest text-secondary font-bold">
+                          {formData.image_url ? 'File Selected ✓' : 'Click to upload or drag & drop'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                      placeholder="https://..."
+                    />
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-50">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Ticket Link</label>
+                    <input
+                      type="text"
+                      value={formData.ticket_link}
+                      onChange={(e) => setFormData({ ...formData, ticket_link: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-xs outline-none focus:border-black transition-all"
+                      placeholder="Official Site URL"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Google Form</label>
+                    <input
+                      type="text"
+                      value={formData.google_form_link}
+                      onChange={(e) => setFormData({ ...formData, google_form_link: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-xs outline-none focus:border-black transition-all"
+                      placeholder="Registration URL"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">YouTube Performance / Trailer</label>
+                  <input
+                    type="text"
+                    value={formData.youtube_url}
+                    onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-xs outline-none focus:border-black transition-all"
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSaving || uploadingFile}
+                  className="w-full bg-black text-white py-6 mt-8 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gray-800 transition-all flex items-center justify-center gap-4"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={16} /> : 'Publish Event'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
