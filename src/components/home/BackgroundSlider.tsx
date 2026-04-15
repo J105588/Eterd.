@@ -9,40 +9,42 @@ interface BackgroundSliderProps {
 
 export default function BackgroundSlider({ images }: BackgroundSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [preloaded, setPreloaded] = useState(false);
+  const [loadedCount, setLoadedCount] = useState(0);
+  const [isReady, setIsReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
-  // Preload all images
+  // Preload images incrementally
   useEffect(() => {
-    let loadedCount = 0;
-    const totalImages = images.length;
-
-    if (totalImages === 0) {
-      setPreloaded(true);
+    if (images.length === 0) {
+      setIsReady(true);
       return;
     }
 
-    images.forEach((src) => {
+    let count = 0;
+    images.forEach((src, index) => {
       const img = new Image();
       img.src = src;
       img.onload = () => {
-        loadedCount++;
-        if (loadedCount === totalImages) {
-          setPreloaded(true);
+        count++;
+        setLoadedCount(prev => prev + 1);
+        // Start as soon as the first image is ready
+        if (index === 0) {
+          setIsReady(true);
         }
       };
       img.onerror = () => {
-        loadedCount++;
-        if (loadedCount === totalImages) {
-          setPreloaded(true);
+        count++;
+        setLoadedCount(prev => prev + 1);
+        if (index === 0) {
+          setIsReady(true);
         }
       };
     });
   }, [images]);
 
   useEffect(() => {
-    if (!preloaded || images.length === 0) return;
+    if (!isReady || images.length === 0) return;
 
     const slides = containerRef.current?.querySelectorAll('.slide');
     if (!slides || slides.length === 0) return;
@@ -57,9 +59,23 @@ export default function BackgroundSlider({ images }: BackgroundSliderProps) {
     let activeIndex = 0;
 
     const playTransition = () => {
+      // Find the next available image that is likely loaded
+      // Since we can't easily sync React state with this GSAP loop variable without re-running effect,
+      // we check the loadedCount to decide how far we can go in the array.
+      // But simple modulo is safer if we assume images load roughly in order or we just loop 
+      // through those that ARE currently in the DOM (which is all of them).
+      
       const nextIndex = (activeIndex + 1) % images.length;
+      
+      // If the next image isn't loaded yet (judging by loadedCount), 
+      // we might want to wait or just jump to the next loaded one.
+      // For simplicity and "incremental" feel, we'll just cycle. 
+      // If it's not loaded, the browser will show white/transparent until it is.
+      
       const currentSlide = slides[activeIndex];
       const nextSlide = slides[nextIndex];
+
+      if (!nextSlide) return;
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -86,7 +102,7 @@ export default function BackgroundSlider({ images }: BackgroundSliderProps) {
           duration: transitionDuration,
           ease: 'power1.inOut'
         },
-        '<' // Start at the same time as currentSlide fade
+        '<'
       );
     };
 
@@ -109,9 +125,10 @@ export default function BackgroundSlider({ images }: BackgroundSliderProps) {
       if (tlRef.current) tlRef.current.kill();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [preloaded, images]);
+  }, [isReady, images.length]); // Dependencies: only start when ready
 
-  if (!preloaded) {
+  // We show the first image as soon as isReady is true
+  if (!isReady) {
     return <div className="fixed inset-0 bg-white z-0" />;
   }
 

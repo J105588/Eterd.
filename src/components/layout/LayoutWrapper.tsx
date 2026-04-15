@@ -60,7 +60,7 @@ export default function LayoutWrapper({
       
       <div 
         className={`relative min-h-screen flex flex-col transition-opacity duration-1000 ${
-          (!isMounted || isChecking || (shouldAnimate && !openingComplete)) ? 'opacity-0' : 'opacity-100'
+          (!isMounted || isChecking) ? 'opacity-0' : 'opacity-100'
         }`}
       >
         <BackgroundSlider images={bgImages} />
