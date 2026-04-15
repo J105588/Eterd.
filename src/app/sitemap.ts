@@ -27,13 +27,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
-  locales.forEach((locale) => {
-    allRoutes.forEach((route) => {
+  allRoutes.forEach((route) => {
+    locales.forEach((locale) => {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}${route}`,
-        lastModified: new Date(),
+        lastModified: new Date().toISOString().split('T')[0], // YYYY-MM-DD
         changeFrequency: route === '' ? 'daily' : 'weekly',
         priority: route === '' ? 1.0 : 0.8,
+        alternates: {
+          languages: {
+            ja: `${baseUrl}/ja${route}`,
+            en: `${baseUrl}/en${route}`,
+          },
+        },
       });
     });
   });
