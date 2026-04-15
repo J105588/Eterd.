@@ -4,6 +4,7 @@ import "../globals.css";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import { i18n, type Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
+import StructuredData from "@/components/seo/StructuredData";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -44,7 +45,15 @@ export async function generateMetadata({
       title: dict.seo.home.title,
       description: dict.seo.home.description,
     },
-    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://eterd.jp"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://eterd.vercel.app"),
+    alternates: {
+      canonical: `/${lang}`,
+      languages: {
+        'ja': '/ja',
+        'en': '/en',
+        'x-default': '/ja', // default to Japanese
+      },
+    },
   };
 }
 
@@ -58,8 +67,23 @@ export default async function LocaleLayout({
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
 
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": "Eterd.",
+    "url": "https://eterd.vercel.app",
+    "logo": "https://eterd.vercel.app/icon.png",
+    "description": dict.seo.home.description,
+    "sameAs": [
+      "https://twitter.com/Eterd_jp", // Placeholder, check if I can find actual links
+    ],
+  };
+
   return (
     <html lang={lang} suppressHydrationWarning>
+      <head>
+        <StructuredData data={organizationData} />
+      </head>
       <body className={`${inter.variable} ${outfit.variable} ${mincho.variable} font-sans antialiased text-foreground selection:bg-black selection:text-white`}>
         <LayoutWrapper lang={lang as Locale} dict={dict}>
           {children}

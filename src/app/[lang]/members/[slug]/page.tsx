@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { Locale } from '@/i18n-config';
 import { TwitterIcon, InstagramIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 import MemberProfileContent from '@/components/members/MemberProfileContent';
+import StructuredData from '@/components/seo/StructuredData';
 
 interface Props {
   params: Promise<{
@@ -15,7 +16,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { lang, slug } = await params;
   const { data: member } = await supabase
     .from('members')
     .select('name, profile_text, is_public')
@@ -28,6 +29,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${member.name}`,
     description: member.profile_text || `${member.name}のプロフィール。`,
     robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${lang}/members/${slug}`,
+      languages: {
+        'ja': `/ja/members/${slug}`,
+        'en': `/en/members/${slug}`,
+      },
+    },
   };
 }
 
@@ -44,7 +52,19 @@ export default async function MemberProfilePage({ params }: Props) {
     notFound();
   }
 
+  const personData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": member.name,
+    "description": member.profile_text,
+    "image": member.image_url,
+    "url": `https://eterd.vercel.app/${lang}/members/${slug}`,
+  };
+
   return (
-    <MemberProfileContent member={member} />
+    <>
+      <StructuredData data={personData} />
+      <MemberProfileContent member={member} />
+    </>
   );
 }

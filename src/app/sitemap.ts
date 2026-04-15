@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 import { i18n } from '@/i18n-config';
+import { supabase } from '@/lib/supabase';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://eterd.jp';
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://eterd.vercel.app';
   const locales = i18n.locales;
 
   const routes = [
@@ -15,10 +16,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/terms',
   ];
 
+  // Fetch all public members
+  const { data: members } = await supabase
+    .from('members')
+    .select('slug')
+    .eq('is_public', true);
+
+  const memberRoutes = members?.map(m => `/members/${m.slug}`) || [];
+  const allRoutes = [...routes, ...memberRoutes];
+
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
   locales.forEach((locale) => {
-    routes.forEach((route) => {
+    allRoutes.forEach((route) => {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}${route}`,
         lastModified: new Date(),
