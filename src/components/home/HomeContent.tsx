@@ -49,8 +49,8 @@ export default function HomeContent({ lang, t, initialEvents = [] }: HomeContent
           opacity: 0,
           y: -10,
           duration: 1,
-          repeat: -1,
-          yoyo: true
+          yoyo: true,
+          force3D: true
         });
 
       // Scroll Transitions for Cards
@@ -80,7 +80,8 @@ export default function HomeContent({ lang, t, initialEvents = [] }: HomeContent
           scrub: true
         },
         y: -200,
-        opacity: 0.1
+        opacity: 0.1,
+        force3D: true
       });
 
       // Line Drawing Animation
@@ -130,6 +131,14 @@ export default function HomeContent({ lang, t, initialEvents = [] }: HomeContent
         <div className="scroll-indicator absolute bottom-12 flex flex-col items-center gap-4 text-secondary">
           <span className="legible-small rotate-90 mb-4">Scroll</span>
           <MoveDown size={20} strokeWidth={1} />
+        </div>
+
+        {/* Decorative Background Text */}
+        <div className="bg-text-parallax fixed top-1/4 -right-12 font-mincho text-[20vh] leading-none select-none pointer-events-none opacity-[0.03] z-0 vertical-rl">
+          ETERD
+        </div>
+        <div className="bg-text-parallax fixed top-1/2 -left-12 font-mincho text-[15vh] leading-none select-none pointer-events-none opacity-[0.02] z-0 vertical-rl transform rotate-180">
+          ETERNAL DYNAMICS
         </div>
       </section>
 

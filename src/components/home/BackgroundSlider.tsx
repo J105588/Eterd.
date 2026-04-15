@@ -144,13 +144,12 @@ export default function BackgroundSlider({ images }: BackgroundSliderProps) {
             backgroundSize: 'cover',
             opacity: 0,
             transform: 'scale(1.0)',
-            maskImage: 'radial-gradient(circle at center 45%, black, rgba(0,0,0,0.8) 30%, transparent 95%)',
-            WebkitMaskImage: 'radial-gradient(circle at center 45%, black, rgba(0,0,0,0.8) 30%, transparent 95%)',
             willChange: 'transform, opacity',
             backfaceVisibility: 'hidden',
           }}
         />
       ))}
+      <div className="vignette-overlay" />
       <div className="white-shroud" />
     </div>
   );

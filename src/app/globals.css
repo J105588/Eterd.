@@ -45,7 +45,7 @@
   /* Strengthened Glassmorphism for Maximum Legibility */
   .luxury-card {
     @apply relative bg-white/85 backdrop-blur-md p-10 md:p-16 border border-white/50 shadow-[0_30px_100px_rgba(0,0,0,0.02)] transition-all duration-700 hover:shadow-[0_40px_120px_rgba(0,0,0,0.05)] hover:-translate-y-2;
-    will-change: transform, opacity;
+    -webkit-backdrop-filter: blur(12px);
     backface-visibility: hidden;
   }
 
@@ -59,7 +59,6 @@
     @apply font-semibold tracking-[0.5em] uppercase px-1 text-black/90;
     text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 
                  0 0 60px rgba(255, 255, 255, 0.4);
-    will-change: transform, opacity;
   }
 
   /* Hero Title specifically */
@@ -91,7 +90,6 @@
 
   .vertical-line {
     @apply w-[1px] h-24 bg-gradient-to-b from-black/80 to-transparent;
-    will-change: height;
   }
 
   .accent-line {
@@ -108,7 +106,6 @@
 .reveal-up {
   @apply opacity-0 translate-y-8;
   transition: transform 1200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 1000ms ease-out;
-  will-change: transform, opacity;
 }
 
 .reveal-up.active {
@@ -126,6 +123,12 @@
 /* Background parallax text adjustment */
 .bg-text-parallax {
   @apply select-none pointer-events-none;
-  mix-blend-mode: multiply;
   opacity: 0.04;
+}
+
+/* New performant vignette overlay */
+.vignette-overlay {
+  @apply absolute inset-0 z-5 pointer-events-none;
+  background: radial-gradient(circle at center 45%, transparent, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.7) 80%, white 98%);
+  backface-visibility: hidden;
 }
