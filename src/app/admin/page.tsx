@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   },
 };
 
+import { Suspense } from 'react';
+
 export default function AdminLoginPage() {
-  return <AdminLoginContent />;
+  return (
+    <Suspense>
+      <AdminLoginContent />
+    </Suspense>
+  );
 }
