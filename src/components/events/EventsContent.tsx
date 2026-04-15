@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Calendar, MapPin, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, ExternalLink, Ticket, FileText, Globe } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import { cn } from '@/lib/utils';
+import { TwitterIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 import type { Locale } from '@/i18n-config';
 import type { Dictionary } from '@/dictionaries/jp';
 
@@ -114,48 +116,43 @@ export default function EventsContent({ lang, dict, initialEvents }: EventsConte
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <p className="text-secondary text-sm font-light leading-relaxed whitespace-pre-wrap">
-                      {event.description || ""}
-                    </p>
-                  </div>
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-4 pt-8 border-t border-gray-100">
+                    {Array.isArray(event.external_links) && event.external_links.map((link: any, index: number) => {
+                      const getIcon = (type: string) => {
+                        switch (type) {
+                          case 'X': return <TwitterIcon size={14} />;
+                          case 'YouTube': return <YoutubeIcon size={16} />;
+                          case 'niconico': return <NiconicoIcon size={16} />;
+                          case 'Ticket': return <Ticket size={14} />;
+                          case 'Google Form': return <FileText size={14} />;
+                          case 'Official Site': return <Globe size={14} />;
+                          default: return <ExternalLink size={14} />;
+                        }
+                      };
 
-                  <div className="flex flex-col sm:flex-row gap-6 pt-10 border-t border-gray-100">
-                    {event.google_form_link && (
-                      <a
-                        href={event.google_form_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative flex items-center justify-center gap-6 overflow-hidden px-10 py-5 bg-black text-white text-[10px] font-bold uppercase tracking-[0.4em]"
-                      >
-                        <span className="relative z-10 transition-transform group-hover:-translate-x-2">
-                          {lang === 'jp' ? '参加申し込み' : 'Participate'}
-                        </span>
-                        <ExternalLink size={14} className="relative z-10 group-hover:translate-x-2 transition-transform" />
-                      </a>
-                    )}
-                    {event.ticket_link && (
-                      <a
-                        href={event.ticket_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative flex items-center justify-center gap-4 overflow-hidden px-10 py-5 border-2 border-black text-black text-[10px] font-bold uppercase tracking-[0.4em] hover:text-white"
-                      >
-                        <span className="relative z-10">{lang === 'jp' ? 'チケット情報' : 'Ticket Info'}</span>
-                        <span className="absolute inset-0 bg-black translate-y-full transition-transform duration-500 ease-out group-hover:translate-y-0" />
-                      </a>
-                    )}
-                    {event.youtube_url && (
-                      <a
-                        href={event.youtube_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative flex items-center justify-center gap-4 overflow-hidden px-10 py-5 border-2 border-red-500 text-red-500 text-[10px] font-bold uppercase tracking-[0.4em] hover:text-white"
-                      >
-                        <span className="relative z-10">YouTube</span>
-                        <span className="absolute inset-0 bg-red-500 translate-y-full transition-transform duration-500 ease-out group-hover:translate-y-0" />
-                      </a>
-                    )}
+                      const isYouTube = link.type === 'YouTube';
+                      const isMain = ['Ticket', 'Google Form', 'Official Site'].includes(link.type);
+
+                      return (
+                        <a
+                          key={index}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            "flex items-center gap-3 px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 border group",
+                            isMain ? "bg-black text-white hover:bg-gray-800 border-black" :
+                            isYouTube ? "border-red-100 text-red-500 hover:border-red-500 hover:bg-red-50" :
+                            "border-gray-100 text-secondary hover:border-black hover:text-black"
+                          )}
+                        >
+                          <span className="transition-transform group-hover:scale-110 duration-300">
+                             {getIcon(link.type)}
+                          </span>
+                          <span>{link.type}</span>
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

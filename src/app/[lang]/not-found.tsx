@@ -17,6 +17,7 @@ export default function NotFound() {
   const codeBgRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
 

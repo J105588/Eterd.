@@ -51,6 +51,7 @@ export default async function Events({
   const { data: events } = await supabase
     .from('events')
     .select('*')
+    .eq('is_public', true)
     .order('event_date', { ascending: true });
 
   return <EventsContent lang={lang} dict={dict} initialEvents={events || []} />;

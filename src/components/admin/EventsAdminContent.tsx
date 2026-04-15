@@ -15,8 +15,19 @@ interface EventItem {
   ticket_link: string | null;
   google_form_link: string | null;
   youtube_url: string | null;
+  external_links: { type: string; url: string }[] | null;
   is_public: boolean;
 }
+
+const LINK_TYPES = [
+  'X',
+  'YouTube',
+  'niconico',
+  'Ticket',
+  'Google Form',
+  'Official Site',
+  'Others'
+];
 
 export default function EventsAdminContent() {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -36,6 +47,7 @@ export default function EventsAdminContent() {
     ticket_link: '',
     google_form_link: '',
     youtube_url: '',
+    external_links: [] as { type: string; url: string }[],
     is_public: true,
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -66,6 +78,7 @@ export default function EventsAdminContent() {
         ticket_link: event.ticket_link || '',
         google_form_link: event.google_form_link || '',
         youtube_url: event.youtube_url || '',
+        external_links: Array.isArray(event.external_links) ? event.external_links : [],
         is_public: event.is_public ?? true,
       });
       setUploadMode('url');
@@ -80,6 +93,7 @@ export default function EventsAdminContent() {
         ticket_link: '',
         google_form_link: '',
         youtube_url: '',
+        external_links: [],
         is_public: true,
       });
       setUploadMode('url');
@@ -113,6 +127,25 @@ export default function EventsAdminContent() {
     } finally {
       setUploadingFile(false);
     }
+  };
+
+  const addExternalLink = () => {
+    setFormData({
+      ...formData,
+      external_links: [...formData.external_links, { type: 'Official Site', url: '' }]
+    });
+  };
+
+  const removeExternalLink = (index: number) => {
+    const newLinks = [...formData.external_links];
+    newLinks.splice(index, 1);
+    setFormData({ ...formData, external_links: newLinks });
+  };
+
+  const updateExternalLink = (index: number, field: 'type' | 'url', value: string) => {
+    const newLinks = [...formData.external_links];
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    setFormData({ ...formData, external_links: newLinks });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -331,38 +364,50 @@ export default function EventsAdminContent() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-50">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Ticket Link</label>
-                    <input
-                      type="text"
-                      value={formData.ticket_link}
-                      onChange={(e) => setFormData({ ...formData, ticket_link: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-xs outline-none focus:border-black transition-all"
-                      placeholder="Official Site URL"
-                    />
+                <div className="space-y-4 pt-6 border-t border-gray-50">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">External Links (X, YouTube, Ticket, etc.)</label>
+                    <button
+                      type="button"
+                      onClick={addExternalLink}
+                      className="text-[10px] font-bold uppercase tracking-widest text-black hover:opacity-100 opacity-40 transition-opacity flex items-center gap-2"
+                    >
+                      <Plus size={12} /> Add Link
+                    </button>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Google Form</label>
-                    <input
-                      type="text"
-                      value={formData.google_form_link}
-                      onChange={(e) => setFormData({ ...formData, google_form_link: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-xs outline-none focus:border-black transition-all"
-                      placeholder="Registration URL"
-                    />
+                  
+                  <div className="space-y-4">
+                    {formData.external_links.map((link, index) => (
+                      <div key={index} className="flex gap-4 items-start animate-fade-in group">
+                        <select
+                          value={link.type}
+                          onChange={(e) => updateExternalLink(index, 'type', e.target.value)}
+                          className="bg-gray-50 border border-gray-100 px-4 py-3 outline-none focus:border-black transition-all text-xs"
+                        >
+                          {LINK_TYPES.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                        <input
+                          type="text"
+                          value={link.url}
+                          onChange={(e) => updateExternalLink(index, 'url', e.target.value)}
+                          placeholder="https://..."
+                          className="flex-grow bg-gray-50 border border-gray-100 px-4 py-3 outline-none focus:border-black transition-all text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeExternalLink(index)}
+                          className="p-3 text-secondary hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                    {formData.external_links.length === 0 && (
+                      <p className="text-[10px] text-gray-300 italic">No external links added.</p>
+                    )}
                   </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">YouTube Performance / Trailer</label>
-                  <input
-                    type="text"
-                    value={formData.youtube_url}
-                    onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-xs outline-none focus:border-black transition-all"
-                    placeholder="https://youtube.com/watch?v=..."
-                  />
                 </div>
 
                 <button

@@ -138,7 +138,7 @@ export default function HomeContent({ lang, t, initialEvents = [] }: HomeContent
           ETERD
         </div>
         <div className="bg-text-parallax fixed top-1/2 -left-12 font-mincho text-[15vh] leading-none select-none pointer-events-none opacity-[0.02] z-0 vertical-rl transform rotate-180">
-          ETERNAL DYNAMICS
+          ETERNAL DREAM
         </div>
       </section>
 
@@ -195,7 +195,7 @@ export default function HomeContent({ lang, t, initialEvents = [] }: HomeContent
                 const date = new Date(event.event_date);
                 const day = date.getDate();
                 const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-                
+
                 return (
                   <div key={event.id} className="flex gap-10 items-start group cursor-pointer border-b border-gray-100 pb-10 last:border-0 hover:bg-gray-50/50 -mx-6 px-6 transition-all duration-500">
                     <div className="luxury-text flex flex-col items-center p-4 bg-white shadow-sm min-w-20 group-hover:bg-black group-hover:text-white transition-all duration-700">
@@ -222,7 +222,7 @@ export default function HomeContent({ lang, t, initialEvents = [] }: HomeContent
               })
             ) : (
               <div className="py-24 text-center border border-dashed border-gray-100 italic text-secondary">
-                 No upcoming events scheduled.
+                No upcoming events scheduled.
               </div>
             )}
 

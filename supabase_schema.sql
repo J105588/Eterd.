@@ -17,6 +17,8 @@ CREATE TABLE events (
   venue TEXT,
   ticket_link TEXT,
   google_form_link TEXT,
+  youtube_url TEXT,
+  external_links JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
