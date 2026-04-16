@@ -54,6 +54,9 @@ export async function generateMetadata({
         'x-default': '/ja', // default to Japanese
       },
     },
+    verification: {
+      google: 'ebc974919646a276',
+    },
   };
 }
 
