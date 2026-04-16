@@ -11,13 +11,20 @@ interface Member {
   slug: string | null;
   profile_text: string | null;
   image_url: string | null;
-  twitter_url: string | null;
-  instagram_url: string | null;
-  niconico_url: string | null;
-  youtube_url: string | null;
   display_order: number;
+  external_links: { type: string; url: string }[] | null;
   is_public: boolean;
 }
+
+const LINK_TYPES = [
+  'X',
+  'Instagram',
+  'YouTube',
+  'niconico',
+  'Official Site',
+  'Blog',
+  'Others'
+];
 
 export default function MembersAdminContent() {
   const [members, setMembers] = useState<Member[]>([]);
@@ -33,11 +40,8 @@ export default function MembersAdminContent() {
     slug: '',
     profile_text: '',
     image_url: '',
-    twitter_url: '',
-    instagram_url: '',
-    niconico_url: '',
-    youtube_url: '',
     display_order: 0,
+    external_links: [] as { type: string; url: string }[],
     is_public: true,
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -64,11 +68,8 @@ export default function MembersAdminContent() {
         slug: member.slug || '',
         profile_text: member.profile_text || '',
         image_url: member.image_url || '',
-        twitter_url: member.twitter_url || '',
-        instagram_url: member.instagram_url || '',
-        niconico_url: member.niconico_url || '',
-        youtube_url: member.youtube_url || '',
         display_order: member.display_order,
+        external_links: Array.isArray(member.external_links) ? member.external_links : [],
         is_public: member.is_public ?? true,
       });
       setUploadMode('url');
@@ -79,11 +80,8 @@ export default function MembersAdminContent() {
         slug: '',
         profile_text: '',
         image_url: '',
-        twitter_url: '',
-        instagram_url: '',
-        niconico_url: '',
-        youtube_url: '',
         display_order: members.length,
+        external_links: [],
         is_public: true,
       });
       setUploadMode('url');
@@ -117,6 +115,25 @@ export default function MembersAdminContent() {
     } finally {
       setUploadingFile(false);
     }
+  };
+
+  const addExternalLink = () => {
+    setFormData({
+      ...formData,
+      external_links: [...formData.external_links, { type: 'X', url: '' }]
+    });
+  };
+
+  const removeExternalLink = (index: number) => {
+    const newLinks = [...formData.external_links];
+    newLinks.splice(index, 1);
+    setFormData({ ...formData, external_links: newLinks });
+  };
+
+  const updateExternalLink = (index: number, field: 'type' | 'url', value: string) => {
+    const newLinks = [...formData.external_links];
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    setFormData({ ...formData, external_links: newLinks });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -342,49 +359,49 @@ export default function MembersAdminContent() {
                 )}
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-gray-50">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary block mb-2">Social Connections</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-tighter text-gray-400">X (Twitter)</span>
-                    <input
-                      type="text"
-                      value={formData.twitter_url}
-                      onChange={(e) => setFormData({ ...formData, twitter_url: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-4 py-3 text-xs outline-none focus:border-black transition-all"
-                      placeholder="URL"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-tighter text-gray-400">Instagram</span>
-                    <input
-                      type="text"
-                      value={formData.instagram_url}
-                      onChange={(e) => setFormData({ ...formData, instagram_url: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-4 py-3 text-xs outline-none focus:border-black transition-all"
-                      placeholder="URL"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-tighter text-gray-400">Niconico</span>
-                    <input
-                      type="text"
-                      value={formData.niconico_url}
-                      onChange={(e) => setFormData({ ...formData, niconico_url: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-4 py-3 text-xs outline-none focus:border-black transition-all"
-                      placeholder="URL"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-tighter text-gray-400">YouTube</span>
-                    <input
-                      type="text"
-                      value={formData.youtube_url}
-                      onChange={(e) => setFormData({ ...formData, youtube_url: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-4 py-3 text-xs outline-none focus:border-black transition-all"
-                      placeholder="URL"
-                    />
-                  </div>
+              <div className="space-y-4 pt-6 border-t border-gray-50">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">External Links (X, YouTube, Blog, etc.)</label>
+                  <button
+                    type="button"
+                    onClick={addExternalLink}
+                    className="text-[10px] font-bold uppercase tracking-widest text-black hover:opacity-100 opacity-40 transition-opacity flex items-center gap-2"
+                  >
+                    <Plus size={12} /> Add Link
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {formData.external_links.map((link, index) => (
+                    <div key={index} className="flex gap-4 items-start animate-fade-in group">
+                      <select
+                        value={link.type}
+                        onChange={(e) => updateExternalLink(index, 'type', e.target.value)}
+                        className="bg-gray-50 border border-gray-100 px-4 py-3 outline-none focus:border-black transition-all text-xs"
+                      >
+                        {LINK_TYPES.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                      <input
+                        type="text"
+                        value={link.url}
+                        onChange={(e) => updateExternalLink(index, 'url', e.target.value)}
+                        placeholder="https://..."
+                        className="flex-grow bg-gray-50 border border-gray-100 px-4 py-3 outline-none focus:border-black transition-all text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeExternalLink(index)}
+                        className="p-3 text-secondary hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {formData.external_links.length === 0 && (
+                    <p className="text-[10px] text-gray-300 italic">No external links added.</p>
+                  )}
                 </div>
               </div>
 

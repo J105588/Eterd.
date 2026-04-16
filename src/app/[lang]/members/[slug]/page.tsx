@@ -52,12 +52,17 @@ export default async function MemberProfilePage({ params }: Props) {
     notFound();
   }
 
+  const socialLinks = [
+    ...(Array.isArray(member.external_links) ? member.external_links.map((l: any) => l.url) : [])
+  ].filter(Boolean);
+
   const personData = {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": member.name,
     "description": member.profile_text,
     "image": member.image_url,
+    "sameAs": socialLinks,
     "url": `https://eterd.vercel.app/${lang}/members/${slug}`,
   };
 

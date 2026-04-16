@@ -6,6 +6,7 @@ CREATE TABLE members (
   profile_text TEXT,
   image_url TEXT,
   display_order INTEGER DEFAULT 0,
+  external_links JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

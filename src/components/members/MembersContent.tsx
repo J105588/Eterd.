@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { User } from 'lucide-react';
+import { User, ExternalLink, Globe, FileText } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 import type { Locale } from '@/i18n-config';
 import type { Dictionary } from '@/dictionaries/jp';
@@ -91,27 +91,33 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
                 </p>
               </div>
 
-              <div className="flex items-center gap-6 pt-6 border-t border-gray-50 w-full justify-center md:justify-start">
-                {member.twitter_url && (
-                  <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-black transition-colors">
-                    <TwitterIcon size={18} />
-                  </a>
-                )}
-                {member.instagram_url && (
-                  <a href={member.instagram_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-black transition-colors">
-                    <InstagramIcon size={18} />
-                  </a>
-                )}
-                {member.youtube_url && (
-                  <a href={member.youtube_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-black transition-colors">
-                    <YoutubeIcon size={18} />
-                  </a>
-                )}
-                {member.niconico_url && (
-                  <a href={member.niconico_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-black transition-colors">
-                    <NiconicoIcon size={18} />
-                  </a>
-                )}
+              <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-gray-50 w-full justify-center md:justify-start">
+                {/* Dynamic External Links Only */}
+                {Array.isArray(member.external_links) && member.external_links.map((link: any, index: number) => {
+                   const getIcon = (type: string) => {
+                     switch (type) {
+                       case 'X': return <TwitterIcon size={18} />;
+                       case 'Instagram': return <InstagramIcon size={18} />;
+                       case 'YouTube': return <YoutubeIcon size={18} />;
+                       case 'niconico': return <NiconicoIcon size={18} />;
+                       case 'Official Site': return <Globe size={18} />;
+                       case 'Blog': return <FileText size={18} />;
+                       default: return <ExternalLink size={18} />;
+                     }
+                   };
+                   return (
+                     <a 
+                       key={index} 
+                       href={link.url} 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       className="text-secondary hover:text-black transition-colors"
+                       title={link.type}
+                     >
+                       {getIcon(link.type)}
+                     </a>
+                   );
+                })}
               </div>
             </div>
           ))

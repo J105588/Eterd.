@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { Globe, ArrowLeft } from 'lucide-react';
+import { Globe, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { TwitterIcon, InstagramIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 
@@ -10,15 +10,29 @@ interface MemberProfileContentProps {
   member: any;
 }
 
+interface SocialLink {
+  name: string;
+  url: string;
+  icon: React.ReactNode;
+}
+
 export default function MemberProfileContent({ member }: MemberProfileContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const socialLinks = [
-    { name: 'X (Twitter)', url: member.twitter_url, icon: <TwitterIcon size={20} /> },
-    { name: 'Instagram', url: member.instagram_url, icon: <InstagramIcon size={20} /> },
-    { name: 'YouTube', url: member.youtube_url, icon: <YoutubeIcon size={20} /> },
-    { name: 'Niconico', url: member.niconico_url, icon: <NiconicoIcon size={20} /> },
-  ].filter(link => link.url);
+  const socialLinks: SocialLink[] = Array.isArray(member.external_links) ? member.external_links.map((link: any) => {
+    const getIcon = (type: string) => {
+      switch (type) {
+        case 'X': return <TwitterIcon size={20} />;
+        case 'Instagram': return <InstagramIcon size={20} />;
+        case 'YouTube': return <YoutubeIcon size={20} />;
+        case 'niconico': return <NiconicoIcon size={20} />;
+        case 'Official Site': return <Globe size={20} />;
+        case 'Blog': return <FileText size={20} />;
+        default: return <ExternalLink size={20} />;
+      }
+    };
+    return { name: link.type, url: link.url, icon: getIcon(link.type) };
+  }) : [];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -78,9 +92,9 @@ export default function MemberProfileContent({ member }: MemberProfileContentPro
 
         {/* Block 3: Social Links Stack */}
         <div className="reveal-block w-full space-y-4 pt-4">
-          {socialLinks.map((link) => (
+          {socialLinks.map((link, index) => (
             <a
-              key={link.name}
+              key={index}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
