@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Users, Calendar, LayoutDashboard, LogOut, Loader2, Settings } from 'lucide-react';
+import { Users, Calendar, LayoutDashboard, LogOut, Loader2, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Inter } from "next/font/google";
 import "../globals.css";
@@ -18,6 +18,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -33,6 +34,11 @@ export default function AdminLayout({
 
     checkUser();
   }, [router, pathname]);
+
+  // Close sidebar on navigation
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
 
   // Auto-logout logic
   useEffect(() => {
@@ -99,15 +105,47 @@ export default function AdminLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased text-foreground selection:bg-black selection:text-white`}>
-        <div className="min-h-screen bg-gray-50 flex">
-          {/* Sidebar */}
-          <aside className="w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full">
-            <div className="p-8 border-b border-gray-100 flex items-center gap-4">
-              <div className="relative w-8 h-8">
+      <body className={`${inter.variable} font-sans antialiased text-foreground selection:bg-black selection:text-white bg-gray-50`}>
+        <div className="min-h-screen flex flex-col lg:flex-row">
+          {/* Mobile Top Bar */}
+          <div className="lg:hidden bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-[100]">
+            <Link href="/admin/dashboard" className="flex items-center gap-3">
+               <div className="relative w-6 h-6">
                 <Image src="/icon.png" alt="Admin Icon" fill className="object-contain" />
               </div>
-              <span className="luxury-text text-lg font-bold">Admin</span>
+              <span className="luxury-text text-sm font-bold">Admin Panel</span>
+            </Link>
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 text-secondary hover:text-black transition-colors"
+            >
+              {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Sidebar Drawer */}
+          <div className={cn(
+            "fixed inset-0 z-[110] lg:hidden transition-opacity duration-300",
+            isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
+          </div>
+
+          <aside className={cn(
+            "w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-[120] transition-transform duration-300 lg:translate-x-0 lg:static",
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          )}>
+            {/* Sidebar Logo Area */}
+            <div className="p-8 border-b border-gray-100 flex items-center justify-between lg:justify-start gap-4">
+              <div className="flex items-center gap-4">
+                <div className="relative w-8 h-8">
+                  <Image src="/icon.png" alt="Admin Icon" fill className="object-contain" />
+                </div>
+                <span className="luxury-text text-lg font-bold">Admin</span>
+              </div>
+              <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 -mr-2 text-secondary">
+                <X size={20} />
+              </button>
             </div>
 
             <nav className="flex-grow p-6 space-y-2">
@@ -140,7 +178,7 @@ export default function AdminLayout({
           </aside>
 
           {/* Main Content */}
-          <main className="flex-grow ml-64 p-12">
+          <main className="flex-grow p-6 lg:p-12 overflow-x-hidden">
             <div className="max-w-6xl mx-auto animate-fade-in">
               {children}
             </div>

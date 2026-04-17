@@ -69,42 +69,42 @@ export default function SiteSettingsContent() {
   ];
 
   return (
-    <div className="space-y-12 max-w-4xl">
-      <header className="flex justify-between items-end">
+    <div className="space-y-8 md:space-y-12 max-w-4xl">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="space-y-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-secondary">Global Configuration</p>
-          <h1 className="text-4xl font-light">Site Settings</h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary opacity-50">Global Configuration</p>
+          <h1 className="text-3xl md:text-4xl font-light">Site Settings</h1>
         </div>
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-black text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center gap-4 disabled:opacity-50"
+          className="bg-black text-white px-6 md:px-8 py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center gap-3 disabled:opacity-50 w-full md:w-auto justify-center"
         >
           {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-          Save Configuration
+          Save Changes
         </button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         {toggleItems.map((item) => (
-          <div key={item.key} className="bg-white border border-gray-100 p-8 flex items-center justify-between group hover:border-black transition-all">
-            <div className="flex items-center gap-6">
-              <div className="text-secondary group-hover:text-black transition-colors">
+          <div key={item.key} className="bg-white border border-gray-100 p-6 md:p-8 flex items-center justify-between group hover:border-black transition-all">
+            <div className="flex items-center gap-4 md:gap-6">
+              <div className="text-secondary group-hover:text-black transition-colors shrink-0">
                 {item.icon}
               </div>
-              <span className="text-xs font-bold uppercase tracking-widest">{item.label}</span>
+              <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">{item.label}</span>
             </div>
             
             <button
               onClick={() => handleToggle(item.key)}
               className={cn(
-                "w-12 h-6 rounded-full transition-all relative flex items-center px-1",
+                "w-10 h-5 md:w-12 md:h-6 rounded-full transition-all relative flex items-center px-1 shrink-0",
                 settings?.[item.key] ? "bg-black" : "bg-gray-200"
               )}
             >
               <div className={cn(
-                "w-4 h-4 bg-white rounded-full transition-transform",
-                settings?.[item.key] ? "translate-x-6" : "translate-x-0"
+                "w-3 h-3 md:w-4 md:h-4 bg-white rounded-full transition-transform",
+                settings?.[item.key] ? "translate-x-5 md:translate-x-6" : "translate-x-0"
               )} />
             </button>
           </div>

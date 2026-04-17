@@ -179,15 +179,15 @@ export default function EventsAdminContent() {
   };
 
   return (
-    <div className="space-y-12">
-      <header className="flex justify-between items-end">
+    <div className="space-y-8 md:space-y-12">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="space-y-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-secondary">Schedule Management</p>
-          <h1 className="text-4xl font-light">Performance Events</h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary opacity-50">Schedule Management</p>
+          <h1 className="text-3xl md:text-4xl font-light">Performance Events</h1>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="bg-black text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center gap-4"
+          className="bg-black text-white px-6 md:px-8 py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center gap-3 w-full md:w-auto justify-center"
         >
           <Plus size={16} /> Create New Event
         </button>
@@ -200,23 +200,23 @@ export default function EventsAdminContent() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {events.map((event) => (
-            <div key={event.id} className="bg-white border border-gray-100 p-8 flex items-center justify-between group hover:border-black transition-all">
-              <div className="flex items-center gap-8">
-                <div className="flex flex-col items-center justify-center p-3 bg-gray-50 luxury-text w-20">
-                  <span className="text-xs text-secondary">{event.event_date.split('-')[1]}/{event.event_date.split('-')[2]}</span>
-                  <span className="text-xl font-bold">{event.event_date.split('-')[0]}</span>
+            <div key={event.id} className="bg-white border border-gray-100 p-4 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group hover:border-black transition-all">
+              <div className="flex items-center gap-4 md:gap-8 w-full sm:w-auto">
+                <div className="flex flex-col items-center justify-center p-2 md:p-3 bg-gray-50 luxury-text w-16 md:w-20 shrink-0">
+                  <span className="text-[10px] text-secondary opacity-60">{event.event_date.split('-')[1]}/{event.event_date.split('-')[2]}</span>
+                  <span className="text-lg md:text-xl font-bold">{event.event_date.split('-')[0]}</span>
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-xl font-light">{event.title}</h3>
+                <div className="space-y-1 flex-grow">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3 className="text-base md:text-xl font-light">{event.title}</h3>
                     {!event.is_public && (
                       <span className="text-[8px] uppercase tracking-widest bg-gray-100 px-2 py-0.5 text-gray-400 font-bold">Draft</span>
                     )}
                   </div>
-                  <p className="text-xs text-secondary uppercase tracking-widest">{event.venue || "No venue set"}</p>
+                  <p className="text-[9px] md:text-xs text-secondary uppercase tracking-widest opacity-60 truncate max-w-[200px] md:max-w-none">{event.venue || "No venue set"}</p>
                 </div>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-2 w-full sm:w-auto justify-end border-t sm:border-0 pt-4 sm:pt-0">
                 <button
                   onClick={() => handleOpenModal(event)}
                   className="p-3 text-secondary hover:text-black hover:bg-gray-50 transition-all"
@@ -237,22 +237,22 @@ export default function EventsAdminContent() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl my-auto">
-            <div className="p-8 md:p-12">
+          <div className="relative bg-white w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-2xl my-auto animate-fade-in">
+            <div className="p-6 md:p-12">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-8 right-8 text-secondary hover:text-black z-10"
+                className="absolute top-6 right-6 md:top-8 md:right-8 text-secondary hover:text-black z-10"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
 
-              <h2 className="luxury-text text-2xl font-bold mb-10">
+              <h2 className="luxury-text text-xl md:text-2xl font-bold mb-8 md:mb-10">
                 {editingEvent ? 'Edit Event' : 'Create New Event'}
               </h2>
 
-              <form onSubmit={handleSave} className="space-y-6">
+              <form onSubmit={handleSave} className="space-y-6 md:space-y-8">
                 <div className="flex items-center gap-4 pb-4 border-b border-gray-50">
                   <button
                     type="button"
@@ -276,11 +276,11 @@ export default function EventsAdminContent() {
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                    className="w-full bg-gray-50 border border-gray-100 px-4 md:px-6 py-3 md:py-4 text-sm outline-none focus:border-black transition-all"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Date</label>
                     <input
@@ -288,7 +288,7 @@ export default function EventsAdminContent() {
                       required
                       value={formData.event_date}
                       onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                      className="w-full bg-gray-50 border border-gray-100 px-4 md:px-6 py-3 md:py-4 text-sm outline-none focus:border-black transition-all"
                     />
                   </div>
                   <div className="space-y-2">
@@ -297,7 +297,7 @@ export default function EventsAdminContent() {
                       type="text"
                       value={formData.venue}
                       onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                      className="w-full bg-gray-50 border border-gray-100 px-4 md:px-6 py-3 md:py-4 text-sm outline-none focus:border-black transition-all"
                     />
                   </div>
                 </div>
@@ -305,18 +305,18 @@ export default function EventsAdminContent() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Description / Info</label>
                   <textarea
-                    rows={3}
+                    rows={4}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all resize-none"
+                    className="w-full bg-gray-50 border border-gray-100 px-4 md:px-6 py-3 md:py-4 text-sm outline-none focus:border-black transition-all resize-none"
                     placeholder="Additional event details..."
                   />
                 </div>
 
                 <div className="space-y-4 pt-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Event Image / Flyer</label>
-                    <div className="flex gap-2 p-1 bg-gray-100 rounded-sm">
+                    <div className="flex gap-2 p-1 bg-gray-100 rounded-sm self-start">
                       <button
                         type="button"
                         onClick={() => setUploadMode('file')}
@@ -335,7 +335,7 @@ export default function EventsAdminContent() {
                   </div>
 
                   {uploadMode === 'file' ? (
-                    <div className="relative border-2 border-dashed border-gray-100 p-8 text-center hover:border-black transition-all group">
+                    <div className="relative border-2 border-dashed border-gray-100 p-6 md:p-8 text-center hover:border-black transition-all group">
                       <input
                         type="file"
                         accept="image/*"
@@ -346,9 +346,9 @@ export default function EventsAdminContent() {
                         {uploadingFile ? (
                           <Loader2 className="animate-spin mx-auto text-black" size={24} />
                         ) : (
-                          <Upload className="mx-auto text-gray-300 group-hover:text-black transition-colors" size={24} />
+                          <Upload className="mx-auto text-gray-300 group-hover:text-black transition-colors" size={20} />
                         )}
-                        <p className="text-[10px] uppercase tracking-widest text-secondary font-bold">
+                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-secondary font-bold">
                           {formData.image_url ? 'File Selected ✓' : 'Click to upload or drag & drop'}
                         </p>
                       </div>
@@ -358,7 +358,7 @@ export default function EventsAdminContent() {
                       type="text"
                       value={formData.image_url}
                       onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-100 px-6 py-4 outline-none focus:border-black transition-all"
+                      className="w-full bg-gray-50 border border-gray-100 px-4 md:px-6 py-3 md:py-4 text-sm outline-none focus:border-black transition-all"
                       placeholder="https://..."
                     />
                   )}
@@ -366,7 +366,7 @@ export default function EventsAdminContent() {
 
                 <div className="space-y-4 pt-6 border-t border-gray-50">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">External Links (X, YouTube, Ticket, etc.)</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">External Links</label>
                     <button
                       type="button"
                       onClick={addExternalLink}
@@ -378,30 +378,32 @@ export default function EventsAdminContent() {
                   
                   <div className="space-y-4">
                     {formData.external_links.map((link, index) => (
-                      <div key={index} className="flex gap-4 items-start animate-fade-in group">
+                      <div key={index} className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-start animate-fade-in group pb-4 sm:pb-0 border-b sm:border-0 border-gray-50">
                         <select
                           value={link.type}
                           onChange={(e) => updateExternalLink(index, 'type', e.target.value)}
-                          className="bg-gray-50 border border-gray-100 px-4 py-3 outline-none focus:border-black transition-all text-xs"
+                          className="bg-gray-50 border border-gray-100 px-3 md:px-4 py-2 md:py-3 outline-none focus:border-black transition-all text-[10px] md:text-sm"
                         >
                           {LINK_TYPES.map(type => (
                             <option key={type} value={type}>{type}</option>
                           ))}
                         </select>
-                        <input
-                          type="text"
-                          value={link.url}
-                          onChange={(e) => updateExternalLink(index, 'url', e.target.value)}
-                          placeholder="https://..."
-                          className="flex-grow bg-gray-50 border border-gray-100 px-4 py-3 outline-none focus:border-black transition-all text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeExternalLink(index)}
-                          className="p-3 text-secondary hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="flex gap-2 flex-grow">
+                          <input
+                            type="text"
+                            value={link.url}
+                            onChange={(e) => updateExternalLink(index, 'url', e.target.value)}
+                            placeholder="https://..."
+                            className="flex-grow bg-gray-50 border border-gray-100 px-3 md:px-4 py-2 md:py-3 outline-none focus:border-black transition-all text-[10px] md:text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeExternalLink(index)}
+                            className="p-2 md:p-3 text-secondary hover:text-red-500 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                     {formData.external_links.length === 0 && (
@@ -413,7 +415,7 @@ export default function EventsAdminContent() {
                 <button
                   type="submit"
                   disabled={isSaving || uploadingFile}
-                  className="w-full bg-black text-white py-6 mt-8 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gray-800 transition-all flex items-center justify-center gap-4"
+                  className="w-full bg-black text-white py-4 md:py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gray-800 transition-all flex items-center justify-center gap-4 mt-8"
                 >
                   {isSaving ? <Loader2 className="animate-spin" size={16} /> : 'Publish Event'}
                 </button>

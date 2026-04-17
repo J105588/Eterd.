@@ -23,6 +23,7 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
   const modalRef = useRef<HTMLDivElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [displayMember, setDisplayMember] = useState<any>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -60,6 +61,7 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
   // Modal Animations
   useEffect(() => {
     if (selectedMember) {
+      setDisplayMember(selectedMember);
       document.body.style.overflow = 'hidden';
       const tl = gsap.timeline();
       
@@ -79,7 +81,8 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
         opacity: 0,
         duration: 0.4,
         display: 'none',
-        ease: 'expo.in'
+        ease: 'expo.in',
+        onComplete: () => setDisplayMember(null)
       });
     }
   }, [selectedMember]);
@@ -187,8 +190,8 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
 
           {/* Left: Image Side */}
           <div className="w-full md:w-2/5 aspect-square md:aspect-auto bg-gray-50 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100">
-            {selectedMember?.image_url ? (
-              <img src={selectedMember.image_url} alt={selectedMember.name} className="w-full h-full object-cover" />
+            {displayMember?.image_url ? (
+              <img src={displayMember.image_url} alt={displayMember.name} className="w-full h-full object-cover" />
             ) : (
               <User size={120} className="text-gray-100" />
             )}
@@ -199,12 +202,12 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
             <header className="space-y-6">
               <div className="space-y-4">
                 <span className="text-[10px] uppercase tracking-[0.5em] text-secondary font-bold">Artist Profile</span>
-                <h2 className="font-mincho text-4xl font-bold tracking-widest">{selectedMember?.name}</h2>
+                <h2 className="font-mincho text-4xl font-bold tracking-widest">{displayMember?.name}</h2>
               </div>
 
               {/* Social Links moved to top */}
               <div className="flex flex-wrap items-center gap-8 pt-2">
-                 {Array.isArray(selectedMember?.external_links) && selectedMember.external_links.map((link: any, index: number) => (
+                 {Array.isArray(displayMember?.external_links) && displayMember.external_links.map((link: any, index: number) => (
                     <a 
                       key={index} 
                       href={link.url} 
@@ -221,7 +224,7 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
 
             <div className="space-y-6 flex-grow overflow-y-auto">
                <p className="text-secondary leading-relaxed font-light whitespace-pre-wrap">
-                 {selectedMember?.profile_text}
+                 {displayMember?.profile_text}
                </p>
             </div>
           </div>
