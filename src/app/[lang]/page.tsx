@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getDictionary } from '@/lib/get-dictionary';
 import type { Locale } from '@/i18n-config';
 import HomeContent from '../../components/home/HomeContent';

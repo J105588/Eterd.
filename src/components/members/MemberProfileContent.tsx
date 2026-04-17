@@ -75,7 +75,7 @@ export default function MemberProfileContent({ member }: MemberProfileContentPro
 
         {/* Block 2: Text Info */}
         <div className="reveal-block text-center space-y-4">
-          <h1 className="font-mincho text-3xl font-bold tracking-widest luxury-text">
+          <h1 className="font-mincho text-3xl font-bold tracking-widest luxury-text normal-case">
             {member.name}
           </h1>
           {member.profile_text && (

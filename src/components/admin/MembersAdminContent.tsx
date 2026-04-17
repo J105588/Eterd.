@@ -54,7 +54,8 @@ export default function MembersAdminContent() {
     const { data, error } = await supabase
       .from('members')
       .select('*')
-      .order('display_order', { ascending: true });
+      .order('display_order', { ascending: true })
+      .order('name', { ascending: true });
 
     if (data) setMembers(data);
     setLoading(false);

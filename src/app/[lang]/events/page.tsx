@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getDictionary } from '@/lib/get-dictionary';
 import type { Metadata } from 'next';
 import type { Locale } from '@/i18n-config';

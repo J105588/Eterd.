@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getDictionary } from '@/lib/get-dictionary';
 import type { Metadata } from 'next';
 import type { Locale } from '@/i18n-config';
@@ -52,7 +54,8 @@ export default async function Members({
     .from('members')
     .select('*')
     .eq('is_public', true)
-    .order('display_order', { ascending: true });
+    .order('display_order', { ascending: true })
+    .order('name', { ascending: true });
 
   return (
     <MembersContent 

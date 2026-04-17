@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { User, ExternalLink, Globe, FileText } from 'lucide-react';
+import { User, ExternalLink, Globe, FileText, X } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 import type { Locale } from '@/i18n-config';
 import type { Dictionary } from '@/dictionaries/jp';
@@ -20,6 +20,9 @@ interface MembersContentProps {
 
 export default function MembersContent({ lang, dict, members }: MembersContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -54,8 +57,47 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
     return () => ctx.revert();
   }, []);
 
+  // Modal Animations
+  useEffect(() => {
+    if (selectedMember) {
+      document.body.style.overflow = 'hidden';
+      const tl = gsap.timeline();
+      
+      tl.to(modalRef.current, {
+        opacity: 1,
+        duration: 0.5,
+        display: 'flex',
+        ease: 'expo.out'
+      }).fromTo(modalContentRef.current, 
+        { y: 40, opacity: 0, scale: 0.98 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'expo.out' },
+        '-=0.3'
+      );
+    } else {
+      document.body.style.overflow = '';
+      gsap.to(modalRef.current, {
+        opacity: 0,
+        duration: 0.4,
+        display: 'none',
+        ease: 'expo.in'
+      });
+    }
+  }, [selectedMember]);
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'X': return <TwitterIcon size={18} />;
+      case 'Instagram': return <InstagramIcon size={18} />;
+      case 'YouTube': return <YoutubeIcon size={18} />;
+      case 'niconico': return <NiconicoIcon size={18} />;
+      case 'Official Site': return <Globe size={18} />;
+      case 'Blog': return <FileText size={18} />;
+      default: return <ExternalLink size={18} />;
+    }
+  };
+
   return (
-    <div ref={containerRef} className="relative z-10 max-w-7xl mx-auto py-32 px-8">
+    <div ref={containerRef} className="relative max-w-7xl mx-auto py-32 px-8">
       <header className="members-title mb-32 space-y-6 text-center">
         <span className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold border-b border-black/10 pb-2 inline-block">
           Affiliated Creators / Artists
@@ -68,7 +110,11 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-x-12 md:gap-y-24">
         {members && members.length > 0 ? (
           members.map((member) => (
-            <div key={member.id} className="member-card group space-y-8 h-full flex flex-col items-center md:items-start">
+            <div 
+              key={member.id} 
+              onClick={() => setSelectedMember(member)}
+              className="member-card group space-y-8 h-full flex flex-col items-center md:items-start cursor-pointer"
+            >
               <div 
                 className="block relative aspect-square w-64 md:w-full max-w-[280px] bg-gray-50 rounded-full border border-gray-100 overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 group-hover:shadow-2xl group-hover:shadow-black/5"
               >
@@ -86,38 +132,28 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
                 <div className="block">
                   <h3 className="font-mincho text-2xl font-bold tracking-widest">{member.name}</h3>
                 </div>
-                <p className="text-secondary text-sm leading-relaxed font-light whitespace-pre-wrap line-clamp-3 group-hover:line-clamp-none transition-all duration-500">
+                <p className="text-secondary text-sm leading-relaxed font-light whitespace-pre-wrap line-clamp-3">
                   {member.profile_text}
                 </p>
+                <button className="text-[10px] uppercase tracking-[0.3em] font-bold text-black opacity-0 group-hover:opacity-100 transition-all pt-2 block mx-auto md:mx-0">
+                   View Profile
+                </button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-gray-50 w-full justify-center md:justify-start">
-                {/* Dynamic External Links Only */}
-                {Array.isArray(member.external_links) && member.external_links.map((link: any, index: number) => {
-                   const getIcon = (type: string) => {
-                     switch (type) {
-                       case 'X': return <TwitterIcon size={18} />;
-                       case 'Instagram': return <InstagramIcon size={18} />;
-                       case 'YouTube': return <YoutubeIcon size={18} />;
-                       case 'niconico': return <NiconicoIcon size={18} />;
-                       case 'Official Site': return <Globe size={18} />;
-                       case 'Blog': return <FileText size={18} />;
-                       default: return <ExternalLink size={18} />;
-                     }
-                   };
-                   return (
-                     <a 
-                       key={index} 
-                       href={link.url} 
-                       target="_blank" 
-                       rel="noopener noreferrer" 
-                       className="text-secondary hover:text-black transition-colors"
-                       title={link.type}
-                     >
-                       {getIcon(link.type)}
-                     </a>
-                   );
-                })}
+              <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-gray-50 w-full justify-center md:justify-start" onClick={(e) => e.stopPropagation()}>
+                {/* Dynamic External Links */}
+                {Array.isArray(member.external_links) && member.external_links.map((link: any, index: number) => (
+                  <a 
+                    key={index} 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-secondary hover:text-black transition-colors"
+                    title={link.type}
+                  >
+                    {getIcon(link.type)}
+                  </a>
+                ))}
               </div>
             </div>
           ))
@@ -126,6 +162,70 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
              No artists published yet.
           </div>
         )}
+      </div>
+
+      {/* Detail Modal */}
+      <div 
+        ref={modalRef}
+        className="fixed inset-0 z-[200] hidden items-center justify-center p-6 md:p-12 opacity-0"
+      >
+        <div 
+          className="absolute inset-0 bg-black/60 backdrop-blur-xl" 
+          onClick={() => setSelectedMember(null)}
+        />
+        
+        <div 
+          ref={modalContentRef}
+          className="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row"
+        >
+          <button 
+            onClick={() => setSelectedMember(null)}
+            className="absolute top-6 right-6 z-20 p-2 bg-white/80 backdrop-blur rounded-full hover:bg-black hover:text-white transition-all shadow-sm"
+          >
+            <X size={20} />
+          </button>
+
+          {/* Left: Image Side */}
+          <div className="w-full md:w-2/5 aspect-square md:aspect-auto bg-gray-50 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100">
+            {selectedMember?.image_url ? (
+              <img src={selectedMember.image_url} alt={selectedMember.name} className="w-full h-full object-cover" />
+            ) : (
+              <User size={120} className="text-gray-100" />
+            )}
+          </div>
+
+          {/* Right: Content Side */}
+          <div className="w-full md:w-3/5 p-10 md:p-16 space-y-10 flex flex-col">
+            <header className="space-y-6">
+              <div className="space-y-4">
+                <span className="text-[10px] uppercase tracking-[0.5em] text-secondary font-bold">Artist Profile</span>
+                <h2 className="font-mincho text-4xl font-bold tracking-widest">{selectedMember?.name}</h2>
+              </div>
+
+              {/* Social Links moved to top */}
+              <div className="flex flex-wrap items-center gap-8 pt-2">
+                 {Array.isArray(selectedMember?.external_links) && selectedMember.external_links.map((link: any, index: number) => (
+                    <a 
+                      key={index} 
+                      href={link.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-3 text-secondary hover:text-black transition-all group"
+                    >
+                      {getIcon(link.type)}
+                      <span className="text-[9px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-opacity">{link.type}</span>
+                    </a>
+                 ))}
+              </div>
+            </header>
+
+            <div className="space-y-6 flex-grow overflow-y-auto">
+               <p className="text-secondary leading-relaxed font-light whitespace-pre-wrap">
+                 {selectedMember?.profile_text}
+               </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
