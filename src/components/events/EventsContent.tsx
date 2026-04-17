@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Calendar, MapPin, ExternalLink, Ticket, FileText, Globe } from 'lucide-react';
+import { Calendar, MapPin, ExternalLink, Ticket, FileText, Globe, Mail } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { cn } from '@/lib/utils';
@@ -126,6 +126,7 @@ export default function EventsContent({ lang, dict, initialEvents }: EventsConte
                           case 'Ticket': return <Ticket size={14} />;
                           case 'Google Form': return <FileText size={14} />;
                           case 'Official Site': return <Globe size={14} />;
+                          case 'Email': return <Mail size={14} />;
                           default: return <ExternalLink size={14} />;
                         }
                       };
@@ -136,7 +137,7 @@ export default function EventsContent({ lang, dict, initialEvents }: EventsConte
                       return (
                         <a
                           key={index}
-                          href={link.url}
+                          href={link.type === 'Email' ? (link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`) : link.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={cn(

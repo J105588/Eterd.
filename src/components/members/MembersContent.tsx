@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { User, ExternalLink, Globe, FileText, X } from 'lucide-react';
+import { User, ExternalLink, Globe, FileText, X, Mail } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 import type { Locale } from '@/i18n-config';
 import type { Dictionary } from '@/dictionaries/jp';
@@ -95,6 +95,7 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
       case 'niconico': return <NiconicoIcon size={18} />;
       case 'Official Site': return <Globe size={18} />;
       case 'Blog': return <FileText size={18} />;
+      case 'Email': return <Mail size={18} />;
       default: return <ExternalLink size={18} />;
     }
   };
@@ -148,9 +149,9 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
                 {Array.isArray(member.external_links) && member.external_links.map((link: any, index: number) => (
                   <a 
                     key={index} 
-                    href={link.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                    href={link.type === 'Email' ? (link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`) : link.url} 
+                    target={link.type === 'Email' ? undefined : "_blank"}
+                    rel={link.type === 'Email' ? undefined : "noopener noreferrer"}
                     className="text-secondary hover:text-black transition-colors"
                     title={link.type}
                   >
@@ -205,18 +206,18 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
                 <h2 className="font-mincho text-4xl font-bold tracking-widest">{displayMember?.name}</h2>
               </div>
 
-              {/* Social Links moved to top */}
+              {/* Social Links simplified */}
               <div className="flex flex-wrap items-center gap-8 pt-2">
                  {Array.isArray(displayMember?.external_links) && displayMember.external_links.map((link: any, index: number) => (
                     <a 
                       key={index} 
-                      href={link.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="flex items-center gap-3 text-secondary hover:text-black transition-all group"
+                      href={link.type === 'Email' ? (link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`) : link.url} 
+                      target={link.type === 'Email' ? undefined : "_blank"}
+                      rel={link.type === 'Email' ? undefined : "noopener noreferrer"}
+                      className="text-secondary hover:text-black transition-all"
+                      title={link.type}
                     >
                       {getIcon(link.type)}
-                      <span className="text-[9px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-opacity">{link.type}</span>
                     </a>
                  ))}
               </div>

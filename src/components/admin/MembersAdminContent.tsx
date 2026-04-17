@@ -23,6 +23,7 @@ const LINK_TYPES = [
   'niconico',
   'Official Site',
   'Blog',
+  'Email',
   'Others'
 ];
 

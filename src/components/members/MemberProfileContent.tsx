@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { Globe, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
+import { Globe, ArrowLeft, ExternalLink, FileText, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { TwitterIcon, InstagramIcon, YoutubeIcon, NiconicoIcon } from '@/components/icons/SocialIcons';
 
@@ -28,6 +28,7 @@ export default function MemberProfileContent({ member }: MemberProfileContentPro
         case 'niconico': return <NiconicoIcon size={20} />;
         case 'Official Site': return <Globe size={20} />;
         case 'Blog': return <FileText size={20} />;
+        case 'Email': return <Mail size={20} />;
         default: return <ExternalLink size={20} />;
       }
     };
@@ -95,7 +96,7 @@ export default function MemberProfileContent({ member }: MemberProfileContentPro
           {socialLinks.map((link, index) => (
             <a
               key={index}
-              href={link.url}
+              href={link.name === 'Email' ? (link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`) : link.url}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between w-full bg-white border border-gray-100 p-6 shadow-sm hover:shadow-md hover:border-black transition-all group"

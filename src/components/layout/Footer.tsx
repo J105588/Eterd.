@@ -33,8 +33,8 @@ export default function Footer({ lang, dict, siteSettings }: FooterProps) {
           <div className="space-y-4">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black">Contact</h3>
             <ul className="space-y-3 text-sm text-secondary font-light">
-              <li><a href="mailto:contact@eterd.jp" className="hover:text-black transition-colors">{dict.links.email}</a></li>
-              <li><a href="https://x.com/Eterd_Official" target="_blank" className="hover:text-black transition-colors">X (Twitter)</a></li>
+              <li><a href="mailto:eterd.contact@gmail.com" className="hover:text-black transition-colors">{dict.links.email}</a></li>
+              <li><a href="https://x.com/Eterd_jp" target="_blank" className="hover:text-black transition-colors">X (Twitter)</a></li>
               {(siteSettings?.show_contact ?? true) && <li><Link href={lang === 'jp' ? '/contact' : '/en/contact'} className="hover:text-black transition-colors">{dict.links.inquiry}</Link></li>}
             </ul>
           </div>

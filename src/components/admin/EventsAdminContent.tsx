@@ -26,6 +26,7 @@ const LINK_TYPES = [
   'Ticket',
   'Google Form',
   'Official Site',
+  'Email',
   'Others'
 ];
 
