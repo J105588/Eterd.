@@ -119,7 +119,7 @@ export default function MembersContent({ lang, dict, members }: MembersContentPr
               className="member-card group space-y-8 h-full flex flex-col items-center md:items-start cursor-pointer"
             >
               <div 
-                className="block relative aspect-square w-64 md:w-full max-w-[280px] bg-gray-50 rounded-full border border-gray-100 overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 group-hover:shadow-2xl group-hover:shadow-black/5"
+                className="block relative aspect-square w-64 md:w-full max-w-[280px] bg-gray-50 rounded-full border border-gray-100 overflow-hidden transition-all duration-1000 group-hover:shadow-2xl group-hover:shadow-black/5"
               >
                 {member.image_url ? (
                   <img src={member.image_url} alt={member.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
