@@ -229,7 +229,7 @@ export default function MembersAdminContent() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
           <div className="relative bg-white w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-2xl my-auto animate-fade-in">
             <div className="p-6 md:p-12">
