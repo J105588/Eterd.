@@ -18,7 +18,7 @@ export default function ContactContent({ lang, t }: ContactContentProps) {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
-      
+
       tl.from('.reveal-item', {
         y: 30,
         opacity: 0,
@@ -57,7 +57,7 @@ export default function ContactContent({ lang, t }: ContactContentProps) {
         {/* Contact Info Cards */}
         <div className="reveal-item grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           {/* Email Card */}
-          <a 
+          <a
             href={`mailto:${t.emailValue}`}
             className="group flex flex-col items-center p-12 md:p-16 bg-white border border-gray-100 rounded-[2.5rem] transition-all duration-700 hover:border-black hover:shadow-2xl hover:shadow-black/5"
           >
@@ -74,8 +74,8 @@ export default function ContactContent({ lang, t }: ContactContentProps) {
           </a>
 
           {/* X Card */}
-          <a 
-            href={`https://x.com/${t.socialValue}`} 
+          <a
+            href={`https://x.com/${t.socialValue}`}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex flex-col items-center p-12 md:p-16 bg-white border border-gray-100 rounded-[2.5rem] transition-all duration-700 hover:border-black hover:shadow-2xl hover:shadow-black/5"
@@ -100,8 +100,8 @@ export default function ContactContent({ lang, t }: ContactContentProps) {
 
         {/* CTA Button */}
         <div className="reveal-item pt-12 md:pt-20">
-          <a 
-            href="#" 
+          <a
+            href="#"
             className="group relative inline-flex items-center gap-6 bg-black text-white px-12 md:px-16 py-6 md:py-8 rounded-full overflow-hidden transition-all duration-700 hover:scale-[1.02] shadow-2xl shadow-black/20"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-700 ease-out" />
@@ -110,9 +110,6 @@ export default function ContactContent({ lang, t }: ContactContentProps) {
             </span>
             <ArrowRight size={24} className="relative z-10 group-hover:translate-x-2 transition-transform duration-500" />
           </a>
-          <p className="mt-8 text-[10px] uppercase tracking-[0.5em] text-gray-300 font-bold">
-            Google Forms
-          </p>
         </div>
       </div>
 
